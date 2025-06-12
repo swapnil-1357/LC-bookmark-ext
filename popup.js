@@ -27,6 +27,7 @@ function viewBookmarks(bookmarks) {
     bookmarks.forEach(bookmark => addNewBookmark(bookmark));
 
 }
+// hjbj
 // console.log()
 
 function addNewBookmark(bookmark) {
