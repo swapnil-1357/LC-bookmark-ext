@@ -1,16 +1,19 @@
 {
   "manifest_version": 3,
-  "name": "Your Chrome Extension Name",
-  "version": "0.1",
-  "author": "First Last",
-  "description": "A description about your Chrome Extension...",
+  "name": "Problem Tracker",
+  "version": "0.1", 
+  "author": "Swapnil Mal",
+  "description": "A chrome extension to store the important question to book mark",
   "permissions": [
-    ""
+    "storage",
+    "tabs"
   ],
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "https://maang.in/*",
+        "https://leetcode.com/*"
+
       ],
       "js": [
         "content.js"
@@ -22,17 +25,21 @@
   },
   "web_accessible_resources" : [
     {
-      "resources": [],
+      "resources": [
+      "assets/bookmark.png",
+      "assets/delete.png",
+      "assets/play.png"
+      ],
       "matches" : ["<all_urls>"]
     }
   ],
   "action": {
     "default_icon": {
-      "16": "logo.png",
-      "24": "logo.png",
-      "32": "logo.png"
+      "16": "assets/ext-icon.png",
+      "24": "assets/ext-icon.png",
+      "32": "assets/ext-icon.png"
     },
-    "default_popup": "index.html",
-    "default_title": "A tooltip popup description when you hover over the Chrome Extension icon."
+    "default_popup": "popup.html",
+    "default_title": "Problem Tracker"
   }
 }
