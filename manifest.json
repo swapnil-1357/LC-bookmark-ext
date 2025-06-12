@@ -11,8 +11,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://maang.in/*",
-        "https://leetcode.com/*"
+        "https://maang.in/*"
+        
 
       ],
       "js": [
