@@ -46,15 +46,13 @@ function addBookmarkButton() {
     else {
         console.warn("error")
     }
-
-    // console.log("hiii")
     bookmarkButton.addEventListener("click", addNewBookmarkHandler);
 
 
 }
 
 async function addNewBookmarkHandler() {
-    console.log("hi");
+
     const currentBookmarks = await getCurrentBookmarks();
     const azProblemUrl = window.location.href;
     const uniqueId = extractUniqueId(azProblemUrl);
@@ -73,7 +71,7 @@ async function addNewBookmarkHandler() {
     const updatedBookmarks = [...currentBookmarks, bookmarkObj];
 
     chrome.storage.sync.set({ AZ_PROBLEM_KEY: updatedBookmarks }, () => {
-        console.log("updated the bookmarks correctly to ", updatedBookmarks);
+        // console.log("updated the bookmarks correctly to ", updatedBookmarks);
     })
 
 
@@ -95,7 +93,7 @@ function getCurrentBookmarks() {
     return new Promise((resolve, reject) => {
 
         chrome.storage.sync.get([AZ_PROBLEM_KEY], (results) => {
-            // console.log(results)
+
             resolve(results[AZ_PROBLEM_KEY] || []);
         })
     })
