@@ -27,6 +27,7 @@ function viewBookmarks(bookmarks) {
     bookmarks.forEach(bookmark => addNewBookmark(bookmark));
 
 }
+// console.log()
 
 function addNewBookmark(bookmark) {
     const newBookmark = document.createElement('div');
