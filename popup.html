@@ -4,15 +4,20 @@
 <head>
    <meta charset="UTF-8" />
    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-   <title>AZ Problems To-Do</title>
+   <title>My LeetCode Bookmarks</title>
    <link rel="stylesheet" href="popup.css" />
-   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 
 <body>
    <div class="container">
-      <h1 class="title">📘 My AZ Problems</h1>
-      <div class="bookmarks" id="bookmarks"></div>
+      <h1>📚 Bookmarked Problems</h1>
+      <select id="difficultyFilter">
+         <option value="All">All</option>
+         <option value="Easy">🟢 Easy</option>
+         <option value="Medium">🟠 Medium</option>
+         <option value="Hard">🔴 Hard</option>
+      </select>
+      <div id="bookmarksList"></div>
    </div>
    <script src="popup.js"></script>
 </body>

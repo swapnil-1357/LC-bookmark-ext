@@ -1,81 +1,84 @@
+const LC_PROBLEM_KEY = "LC_PROBLEM_KEY";
+const bookmarksList = document.getElementById("bookmarksList");
+const difficultyFilter = document.getElementById("difficultyFilter");
 
-const AZ_PROBLEM_KEY = "AZ_PROBLEM_KEY";
-
-const assetsURLMap = {
-    "play": chrome.runtime.getURL("assets/play.png"),
-    "delete": chrome.runtime.getURL("assets/delete.png")
-
-}
-
-const bookmarkSection = document.getElementById("bookmarks");
-
-document.addEventListener("DOMContentLoaded", () => {
-    chrome.storage.sync.get([AZ_PROBLEM_KEY], (data) => {
-        const currentBookmarks = data[AZ_PROBLEM_KEY] || [];
-        viewBookmarks(currentBookmarks);
-    });
+document.addEventListener("DOMContentLoaded", async () => {
+    const bookmarks = await getBookmarks();
+    renderBookmarks(bookmarks);
 });
 
-function viewBookmarks(bookmarks) {
-    bookmarkSection.innerHTML = "";
+difficultyFilter.addEventListener("change", async () => {
+    const bookmarks = await getBookmarks();
+    renderBookmarks(bookmarks);
+});
 
-    if (bookmarks.length === 0) {
-        bookmarkSection.innerHTML = "<i>No Bookmarks to Show</i>";
-        return;
-    }
-
-    bookmarks.forEach(bookmark => addNewBookmark(bookmark));
-
+function getBookmarks() {
+    return new Promise((resolve) => {
+        chrome.storage.sync.get([LC_PROBLEM_KEY], (result) => {
+            resolve(result[LC_PROBLEM_KEY] || []);
+        });
+    });
 }
 
+function renderBookmarks(bookmarks) {
+    const selectedDiff = difficultyFilter.value;
+    const sections = { Easy: [], Medium: [], Hard: [] };
 
-function addNewBookmark(bookmark) {
-    const newBookmark = document.createElement('div');
-    const bookmarkTitle = document.createElement('div');
-    const bookmarkControls = document.createElement('div');
+    // Filter and categorize
+    bookmarks
+        .filter(b => selectedDiff === "All" || b.difficulty === selectedDiff)
+        .sort((a, b) => {
+            const priority = { High: 1, Medium: 2, Low: 3 };
+            return priority[a.importance] - priority[b.importance];
+        })
+        .forEach(b => sections[b.difficulty]?.push(b));
 
-    bookmarkTitle.textContent = bookmark.name;
-    bookmarkTitle.classList.add("bookmark-title");
+    bookmarksList.innerHTML = "";
 
-    setControlAttributes(assetsURLMap["play"], onPlay, bookmarkControls);
-    setControlAttributes(assetsURLMap["delete"], onDelete, bookmarkControls);
-    bookmarkControls.classList.add("bookmark-controls");
+    Object.entries(sections).forEach(([difficulty, items]) => {
+        if (items.length === 0) return;
 
-    newBookmark.classList.add("bookmark");
+        const sectionTitle = document.createElement("div");
+        sectionTitle.textContent = difficulty;
+        sectionTitle.className = "section-title";
+        bookmarksList.appendChild(sectionTitle);
 
-    newBookmark.append(bookmarkTitle);
-    newBookmark.append(bookmarkControls);
+        items.forEach(bookmark => {
+            const div = document.createElement("div");
+            div.className = "bookmark";
 
-    newBookmark.setAttribute("url", bookmark.url);
-    newBookmark.setAttribute("bookmark-id", bookmark.id);
+            const title = document.createElement("div");
+            title.className = "bookmark-title";
+            title.textContent = bookmark.name;
 
-    bookmarkSection.appendChild(newBookmark);
-}
+            const meta = document.createElement("div");
+            meta.className = "bookmark-meta";
+            meta.innerHTML = `<span class="importance-${bookmark.importance.toLowerCase()}">${bookmark.importance}</span> - ${bookmark.difficulty}`;
 
-function setControlAttributes(src, handler, parentDiv) {
-    const controlElement = document.createElement("img");
-    controlElement.src = src;
-    controlElement.addEventListener("click", handler);
-    parentDiv.appendChild(controlElement);
-}
+            const controls = document.createElement("div");
+            controls.className = "bookmark-controls";
 
-function onPlay(event) {
-    const problemUrl = event.target.parentNode.parentNode.getAttribute("url");
-    window.open(problemUrl, "_blank");
-}
+            const openBtn = document.createElement("img");
+            openBtn.src = "assets/play.png";
+            openBtn.title = "Open";
+            openBtn.onclick = () => chrome.tabs.create({ url: bookmark.url });
 
-function onDelete(event) {
-    const bookmarkItem = event.target.parentNode.parentNode;
-    const idToRemove = bookmarkItem.getAttribute("bookmark-id");
-    bookmarkItem.remove();
+            const deleteBtn = document.createElement("img");
+            deleteBtn.src = "assets/delete.png";
+            deleteBtn.title = "Delete";
+            deleteBtn.onclick = async () => {
+                const updated = (await getBookmarks()).filter(b => b.id !== bookmark.id);
+                chrome.storage.sync.set({ [LC_PROBLEM_KEY]: updated }, () => renderBookmarks(updated));
+            };
 
-    deleteItemFromStorage(idToRemove);
-}
+            controls.appendChild(openBtn);
+            controls.appendChild(deleteBtn);
 
-function deleteItemFromStorage(idToRemove) {
-    chrome.storage.sync.get([AZ_PROBLEM_KEY], (data) => {
-        const currentBookmarks = data[AZ_PROBLEM_KEY] || [];
-        const updatedBookmarks = currentBookmarks.filter((bookmark) => bookmark.id !== idToRemove);
-        chrome.storage.sync.set({ AZ_PROBLEM_KEY: updatedBookmarks });
-    })
+            div.appendChild(title);
+            div.appendChild(meta);
+            div.appendChild(controls);
+
+            bookmarksList.appendChild(div);
+        });
+    });
 }

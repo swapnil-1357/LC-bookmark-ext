@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Problem Tracker",
-  "version": "0.1", 
+  "name": "LC Problem Tracker",
+  "version": "0.1",
   "author": "Swapnil Mal",
-  "description": "A chrome extension to store the important question to book mark",
+  "description": "A chrome extension to store the important AZ question to book mark",
   "permissions": [
     "storage",
     "tabs"
@@ -11,9 +11,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://maang.in/*"
-        
-
+        "https://leetcode.com/*"
       ],
       "js": [
         "content.js"
@@ -23,23 +21,25 @@
   "background": {
     "service_worker": "background.js"
   },
-  "web_accessible_resources" : [
+  "web_accessible_resources": [
     {
       "resources": [
-      "assets/bookmark.png",
-      "assets/delete.png",
-      "assets/play.png"
+        "assets/bookmark.png",
+        "assets/delete.png",
+        "assets/play.png"
       ],
-      "matches" : ["<all_urls>"]
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "action": {
     "default_icon": {
-      "16": "assets/ext-icon.png",
-      "24": "assets/ext-icon.png",
-      "32": "assets/ext-icon.png"
+      "16": "assets/edit.png",
+      "24": "assets/edit.png",
+      "32": "assets/edit.png"
     },
     "default_popup": "popup.html",
-    "default_title": "Problem Tracker"
+    "default_title": "LC Problem Tracker"
   }
 }
