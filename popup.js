@@ -1,3 +1,6 @@
+// popup.js
+import { showNotesPopup } from './popupNotes.js';
+
 const LC_PROBLEM_KEY = "LC_PROBLEM_KEY";
 const bookmarksList = document.getElementById("bookmarksList");
 const difficultyFilter = document.getElementById("difficultyFilter");
@@ -14,6 +17,11 @@ difficultyFilter.addEventListener("change", async () => {
 
 function getBookmarks() {
     return new Promise((resolve) => {
+        if (!chrome?.storage?.sync) {
+            console.error("chrome.storage.sync is not available");
+            resolve([]);
+            return;
+        }
         chrome.storage.sync.get([LC_PROBLEM_KEY], (result) => {
             resolve(result[LC_PROBLEM_KEY] || []);
         });
@@ -24,7 +32,6 @@ function renderBookmarks(bookmarks) {
     const selectedDiff = difficultyFilter.value;
     const sections = { Easy: [], Medium: [], Hard: [] };
 
-    // Filter and categorize
     bookmarks
         .filter(b => selectedDiff === "All" || b.difficulty === selectedDiff)
         .sort((a, b) => {
@@ -71,8 +78,31 @@ function renderBookmarks(bookmarks) {
                 chrome.storage.sync.set({ [LC_PROBLEM_KEY]: updated }, () => renderBookmarks(updated));
             };
 
+            const noteBtn = document.createElement("img");
+            noteBtn.src = "assets/note.png";
+            noteBtn.title = "Notes";
+            noteBtn.style.width = "18px";
+            noteBtn.style.height = "18px";
+            noteBtn.style.cursor = "pointer";
+            noteBtn.onclick = () => {
+                const savedNote = localStorage.getItem(`leetcode-notes-${bookmark.id}`) || "";
+                showNotesPopup(bookmark.id, savedNote);
+            };
+
+            const copyBtn = document.createElement("img");
+            copyBtn.src = "assets/copy.png";
+            copyBtn.title = "Copy Link";
+            copyBtn.style.width = "18px";
+            copyBtn.style.height = "18px";
+            copyBtn.style.cursor = "pointer";
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(bookmark.url).then(() => alert("Link copied!"));
+            };
+
             controls.appendChild(openBtn);
             controls.appendChild(deleteBtn);
+            controls.appendChild(noteBtn);
+            controls.appendChild(copyBtn);
 
             div.appendChild(title);
             div.appendChild(meta);

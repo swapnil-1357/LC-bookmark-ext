@@ -1,29 +1,37 @@
+/* Overall Page Styling */
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
     background: #f6f8fa;
     color: #1f2937;
+    max-height: 600px;
+    overflow-y: auto;
 }
 
+/* Container Layout */
 .container {
     width: 320px;
     padding: 16px;
 }
 
+/* Heading */
 h1 {
     font-size: 18px;
     text-align: center;
     margin-bottom: 12px;
 }
 
+/* Dropdown */
 select {
     width: 100%;
     padding: 6px;
     margin-bottom: 10px;
     border-radius: 6px;
     border: 1px solid #ccc;
+    font-size: 14px;
 }
 
+/* Section Headers (Easy, Medium, Hard) */
 .section-title {
     font-size: 14px;
     font-weight: bold;
@@ -32,6 +40,7 @@ select {
     border-bottom: 1px solid #ccc;
 }
 
+/* Each Bookmark Card */
 .bookmark {
     background-color: #fff;
     border: 1px solid #e0e0e0;
@@ -43,18 +52,22 @@ select {
     flex-direction: column;
 }
 
+/* Title Styling */
 .bookmark-title {
     font-weight: 600;
     font-size: 14px;
     margin-bottom: 6px;
+    color: #111827;
 }
 
+/* Difficulty + Importance Meta Text */
 .bookmark-meta {
     font-size: 12px;
     color: #555;
     margin-bottom: 6px;
 }
 
+/* Color-coded Importance */
 .importance-high {
     color: #e74c3c;
     font-weight: bold;
@@ -70,12 +83,14 @@ select {
     font-weight: bold;
 }
 
+/* Buttons Area */
 .bookmark-controls {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
 }
 
+/* Button Icons */
 .bookmark-controls img {
     width: 18px;
     height: 18px;
@@ -85,4 +100,28 @@ select {
 
 .bookmark-controls img:hover {
     transform: scale(1.2);
+}
+
+/* Notes Popup (styled inline in JS, optional override) */
+textarea {
+    font-family: inherit;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+button {
+    padding: 6px 10px;
+    font-size: 20px;
+    border-radius: 6px;
+    border: none;
+    background-color: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #1d4ed8;
 }

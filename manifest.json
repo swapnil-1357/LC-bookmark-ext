@@ -6,7 +6,8 @@
   "description": "A chrome extension to store the important AZ question to book mark",
   "permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "scripting"
   ],
   "content_scripts": [
     {
@@ -15,18 +16,26 @@
       ],
       "js": [
         "content.js"
-      ]
+      ],
+      "run_at": "document_idle"
     }
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "type": "module"
+
+
   },
   "web_accessible_resources": [
     {
       "resources": [
+        "assets/save.png",
         "assets/bookmark.png",
+        "assets/edit.png",
         "assets/delete.png",
-        "assets/play.png"
+        "assets/play.png",
+        "assets/copy.png",
+        "assets/note.png"
       ],
       "matches": [
         "<all_urls>"
@@ -35,9 +44,9 @@
   ],
   "action": {
     "default_icon": {
-      "16": "assets/edit.png",
-      "24": "assets/edit.png",
-      "32": "assets/edit.png"
+      "16": "assets/ext-icon.png",
+      "24": "assets/ext-icon.png",
+      "32": "assets/ext-icon.png"
     },
     "default_popup": "popup.html",
     "default_title": "LC Problem Tracker"
