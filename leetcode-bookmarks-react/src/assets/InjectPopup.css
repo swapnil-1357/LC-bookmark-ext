@@ -1,0 +1,26 @@
+.inject-popup-container {
+    position: fixed;
+    top: 120px;
+    right: 20px;
+    z-index: 9999;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    width: 220px;
+    font-family: sans-serif;
+}
+
+.inject-popup-container h4 {
+    margin: 0 0 8px;
+    font-size: 14px;
+}
+
+.inject-popup-container select,
+.inject-popup-container button {
+    width: 100%;
+    margin-top: 6px;
+    padding: 4px;
+    font-size: 13px;
+}

@@ -8,8 +8,8 @@ body {
     overflow-y: auto;
 }
 
-/* Container Layout */
-.container {
+/* Root for React Mount */
+#root {
     width: 320px;
     padding: 16px;
 }
@@ -102,26 +102,62 @@ select {
     transform: scale(1.2);
 }
 
-/* Notes Popup (styled inline in JS, optional override) */
+/* Modal Styling (Optional override for NotesModal) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-content {
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    max-width: 320px;
+    width: 90%;
+}
+
 textarea {
     font-family: inherit;
+    width: 100%;
     padding: 8px;
     font-size: 14px;
     border-radius: 6px;
     border: 1px solid #ccc;
     resize: vertical;
+    margin-bottom: 8px;
+    min-height: 100px;
 }
 
 button {
     padding: 6px 10px;
-    font-size: 20px;
+    font-size: 14px;
     border-radius: 6px;
     border: none;
     background-color: #2563eb;
     color: white;
     cursor: pointer;
+    margin-right: 8px;
 }
 
 button:hover {
     background-color: #1d4ed8;
+}
+#leetcode-injected-popup {
+    position: fixed;
+    top: 100px;
+    right: 40px;
+    z-index: 9999;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 12px;
 }
