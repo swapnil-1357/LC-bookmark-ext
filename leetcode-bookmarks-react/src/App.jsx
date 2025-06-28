@@ -10,13 +10,17 @@ export default function App() {
   const [filter, setFilter] = useState("All");
   const [noteId, setNoteId] = useState(null);
 
-  useEffect(() => {
+  const loadBookmarks = () => {
     chrome.storage.sync.get([LC_KEY], (result) => {
       setBookmarks(result[LC_KEY] || []);
     });
+  };
+
+  useEffect(() => {
+    loadBookmarks(); // on popup open
   }, []);
 
-  // Optional: Live sync across tabs
+  // Live update when bookmarks are changed in other tabs
   useEffect(() => {
     const listener = (changes, area) => {
       if (area === "sync" && changes[LC_KEY]) {
@@ -55,7 +59,9 @@ export default function App() {
       </select>
 
       {filtered.length === 0 ? (
-        <p style={{ textAlign: "center", marginTop: "1rem" }}>No bookmarks found for this filter.</p>
+        <p style={{ textAlign: "center", marginTop: "1rem" }}>
+          No bookmarks found for this filter.
+        </p>
       ) : (
         filtered.map(b => (
           <BookmarkCard

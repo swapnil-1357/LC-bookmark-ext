@@ -1,4 +1,3 @@
-// components/NotesModal.jsx
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 
@@ -6,13 +5,25 @@ export default function NotesModal({ problemId, onClose }) {
     const [note, setNote] = useState("");
 
     useEffect(() => {
-        const stored = localStorage.getItem(`leetcode-notes-${problemId}`) || "";
-        setNote(stored);
+        chrome.storage.sync.get([`leetcode-note-${problemId}`], (result) => {
+            setNote(result[`leetcode-note-${problemId}`] || "");
+        });
+
+        const handleKeyDown = (e) => {
+            if (e.key === "Escape") {
+                onClose();
+            } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+                e.preventDefault();
+                saveNote();
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
     }, [problemId]);
 
     const saveNote = () => {
-        localStorage.setItem(`leetcode-notes-${problemId}`, note);
-        onClose();
+        chrome.storage.sync.set({ [`leetcode-note-${problemId}`]: note }, onClose);
     };
 
     return ReactDOM.createPortal(

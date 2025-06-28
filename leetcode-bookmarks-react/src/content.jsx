@@ -21,15 +21,20 @@ if (!document.getElementById(mountId)) {
     const url = window.location.href;
 
     const handleSave = (bookmark) => {
+        bookmark.id = url; // Ensure unique ID per problem
         chrome.storage.sync.get([LC_PROBLEM_KEY], (result) => {
             const existing = result[LC_PROBLEM_KEY] || [];
-            const updated = [...existing.filter(b => b.id !== bookmark.id), bookmark];
+            const filtered = existing.filter(b => b.id !== bookmark.id);
+            const updated = [...filtered, bookmark];
             chrome.storage.sync.set({ [LC_PROBLEM_KEY]: updated }, () => {
-                alert("Bookmark Saved!");
-                mount.style.display = "none"; // Hide after saving
+                alert("✅ Problem bookmarked!");
+                console.log("Bookmarks now:", updated);
+                const popup = document.getElementById(mountId);
+                if (popup) popup.style.display = "none";
             });
         });
     };
+      
 
     const root = ReactDOM.createRoot(mount);
     root.render(<InjectPopup url={url} onSave={handleSave} />);
@@ -56,7 +61,7 @@ const insertBookmarkIcon = () => {
     container.appendChild(img);
 };
 
-// Observe DOM in case React re-renders
+// Observe DOM changes in case React re-renders
 const observer = new MutationObserver(() => insertBookmarkIcon());
 if (document.body) {
     observer.observe(document.body, { childList: true, subtree: true });

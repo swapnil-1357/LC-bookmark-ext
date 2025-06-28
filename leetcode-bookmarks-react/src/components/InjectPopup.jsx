@@ -8,9 +8,9 @@ const InjectPopup = ({ url, onSave }) => {
 
     useEffect(() => {
         // Try to get problem name from LeetCode class
-        const titleEl = document.querySelector(".items-start h1") || document.querySelector("h1");
+        const titleEl = document.querySelector(".items-start") || document.querySelector("h1");
         if (titleEl) setProblemName(titleEl.textContent.trim());
-        else console.warn("Problem name not found using '.items-start h1'");
+        else console.warn("Problem name not found using '.items-start'");
     }, []);
 
     const handleSave = () => {
