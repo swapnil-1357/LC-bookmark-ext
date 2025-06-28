@@ -12,20 +12,13 @@
   "content_scripts": [
     {
       "matches": [
-        "https://leetcode.com/*"
+        "https://leetcode.com/problems/*"
       ],
       "js": [
         "content.js"
-      ],
-      "run_at": "document_idle"
+      ]
     }
   ],
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
-
-
-  },
   "web_accessible_resources": [
     {
       "resources": [
@@ -44,11 +37,11 @@
   ],
   "action": {
     "default_icon": {
-      "16": "assets/ext-icon.png",
-      "24": "assets/ext-icon.png",
-      "32": "assets/ext-icon.png"
+      "16": "icons/ext-icon.png",
+      "24": "icons/ext-icon.png",
+      "32": "icons/ext-icon.png"
     },
-    "default_popup": "popup.html",
+    "default_popup": "public/index.html",
     "default_title": "LC Problem Tracker"
   }
 }
