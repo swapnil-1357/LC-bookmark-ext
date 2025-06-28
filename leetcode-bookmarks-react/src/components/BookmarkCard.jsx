@@ -26,35 +26,37 @@ export default function BookmarkCard({ bookmark, onDelete, onNote, onCopy }) {
     };
 
     return (
-        <div style={{
-            border: "1px solid #ccc",
-            borderRadius: "10px",
-            padding: "10px",
-            marginBottom: "10px",
-            backgroundColor: "#fff",
-            boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
-        }}>
+        <div className="bookmark-card-animated">
             <div style={{
-                fontWeight: "600",
-                fontSize: "16px",
-                marginBottom: "4px"
-            }}>{bookmark.name}</div>
+                border: "1px solid #ccc",
+                borderRadius: "10px",
+                padding: "10px",
+                marginBottom: "10px",
+                backgroundColor: "#fff",
+                boxShadow: "0 2px 5px rgba(0,0,0,0.1)"
+            }}>
+                <div style={{
+                    fontWeight: "600",
+                    fontSize: "16px",
+                    marginBottom: "4px"
+                }}>{bookmark.name}</div>
 
-            <div style={{ marginBottom: "8px", fontSize: "14px" }}>
-                <span style={{ color: importanceColors[bookmark.importance] }}>
-                    {bookmark.importance}
-                </span>
-                {" - "}
-                <span style={{ color: difficultyColors[bookmark.difficulty] }}>
-                    {bookmark.difficulty}
-                </span>
-            </div>
+                <div style={{ marginBottom: "8px", fontSize: "14px" }}>
+                    <span style={{ color: importanceColors[bookmark.importance] }}>
+                        {bookmark.importance}
+                    </span>
+                    {" - "}
+                    <span style={{ color: difficultyColors[bookmark.difficulty] }}>
+                        {bookmark.difficulty}
+                    </span>
+                </div>
 
-            <div style={{ display: "flex", gap: "10px" }}>
-                <img src={play} alt="Open" title="Open Problem" style={iconStyle} onClick={openInNewTab} />
-                <img src={del} alt="Delete" title="Delete Bookmark" style={iconStyle} onClick={onDelete} />
-                <img src={note} alt="Notes" title="Add/View Notes" style={iconStyle} onClick={onNote} />
-                <img src={copy} alt="Copy" title="Copy Link" style={iconStyle} onClick={onCopy} />
+                <div style={{ display: "flex", gap: "10px" }}>
+                    <img src={play} alt="Open" title="Open Problem" style={iconStyle} onClick={openInNewTab} />
+                    <img src={del} alt="Delete" title="Delete Bookmark" style={iconStyle} onClick={onDelete} />
+                    <img src={note} alt="Notes" title="Add/View Notes" style={iconStyle} onClick={onNote} />
+                    <img src={copy} alt="Copy" title="Copy Link" style={iconStyle} onClick={onCopy} />
+                </div>
             </div>
         </div>
     );

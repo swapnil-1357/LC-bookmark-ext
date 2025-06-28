@@ -48,38 +48,40 @@ export default function App() {
     });
 
   return (
-    <div className="container">
-      <h1>📚 Bookmarked Problems</h1>
+    <div className="popup-container">
+      <div className="container">
+        <h1 className="popup-title">📚 Bookmarked Problems</h1>
 
-      <select value={filter} onChange={(e) => setFilter(e.target.value)}>
-        <option value="All">All</option>
-        <option value="Easy">🟢 Easy</option>
-        <option value="Medium">🟠 Medium</option>
-        <option value="Hard">🔴 Hard</option>
-      </select>
+        <select className="popup-filter" value={filter} onChange={(e) => setFilter(e.target.value)}>
+          <option value="All">All</option>
+          <option value="Easy">🟢 Easy</option>
+          <option value="Medium">🟠 Medium</option>
+          <option value="Hard">🔴 Hard</option>
+        </select>
 
-      {filtered.length === 0 ? (
-        <p style={{ textAlign: "center", marginTop: "1rem" }}>
-          No bookmarks found for this filter.
-        </p>
-      ) : (
-        filtered.map(b => (
-          <BookmarkCard
-            key={b.id}
-            bookmark={b}
-            onDelete={() => handleDelete(b.id)}
-            onNote={() => setNoteId(b.id)}
-            onCopy={() => handleCopy(b.url)}
+        {filtered.length === 0 ? (
+          <p style={{ textAlign: "center", marginTop: "1rem" }}>
+            No bookmarks found for this filter.
+          </p>
+        ) : (
+          filtered.map(b => (
+            <BookmarkCard
+              key={b.id}
+              bookmark={b}
+              onDelete={() => handleDelete(b.id)}
+              onNote={() => setNoteId(b.id)}
+              onCopy={() => handleCopy(b.url)}
+            />
+          ))
+        )}
+
+        {noteId && (
+          <NotesModal
+            problemId={noteId}
+            onClose={() => setNoteId(null)}
           />
-        ))
-      )}
-
-      {noteId && (
-        <NotesModal
-          problemId={noteId}
-          onClose={() => setNoteId(null)}
-        />
-      )}
+        )}
+      </div>
     </div>
   );
 }

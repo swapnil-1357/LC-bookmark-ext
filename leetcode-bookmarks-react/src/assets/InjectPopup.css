@@ -3,24 +3,105 @@
     top: 120px;
     right: 20px;
     z-index: 9999;
-    background: #fff;
-    border: 1px solid #ccc;
-    padding: 12px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    width: 220px;
-    font-family: sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+    border: 2px solid #6366f1;
+    padding: 28px 32px 24px 32px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(60, 72, 180, 0.18);
+    min-width: 300px;
+    max-width: 360px;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    animation: popup-fade-in 0.4s;
 }
 
+@keyframes popup-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inject-popup-title,
+.inject-popup-container h3,
 .inject-popup-container h4 {
-    margin: 0 0 8px;
-    font-size: 14px;
+    margin: 0 0 12px 0;
+    font-size: 1.3em;
+    text-align: center;
+    background: linear-gradient(90deg, #6366f1 0%, #06b6d4 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 0;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
 }
 
-.inject-popup-container select,
-.inject-popup-container button {
-    width: 100%;
-    margin-top: 6px;
-    padding: 4px;
-    font-size: 13px;
+.inject-popup-row {
+    margin-bottom: 10px;
+    font-size: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.inject-popup-container label {
+    font-weight: 600;
+    margin-bottom: 2px;
+    color: #6366f1;
+}
+
+.inject-popup-container select {
+    margin-left: 8px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1.5px solid #a5b4fc;
+    background: #f1f5f9;
+    color: #3730a3;
+    font-weight: 500;
+    font-size: 1em;
+    transition: border 0.2s;
+}
+
+.inject-popup-container select:focus {
+    border: 1.5px solid #06b6d4;
+    outline: none;
+}
+
+.inject-popup-save-btn {
+    margin-top: 14px;
+    padding: 10px 0;
+    background: linear-gradient(90deg, #06b6d4 0%, #6366f1 100%);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.08em;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(6, 182, 212, 0.12);
+    letter-spacing: 0.5px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.inject-popup-save-btn:hover {
+    background: linear-gradient(90deg, #6366f1 0%, #06b6d4 100%);
+    transform: translateY(-2px) scale(1.03);
+}
+
+.inject-popup-container a {
+    color: #06b6d4;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+.inject-popup-container a:hover {
+    color: #6366f1;
 }
