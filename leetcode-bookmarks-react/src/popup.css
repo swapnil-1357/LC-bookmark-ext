@@ -160,7 +160,8 @@ button:hover {
     max-width: 420px;
     min-height: 0;
     height: auto;
-    max-height: 600px; /* or your preferred max */
+    max-height: 600px;
+    /* or your preferred max */
     border-radius: 18px;
     box-shadow: 0 8px 32px rgba(60, 72, 180, 0.18);
     font-family: 'Segoe UI', Arial, sans-serif;
