@@ -42,6 +42,7 @@ select {
 
 /* Each Bookmark Card */
 .bookmark {
+    width: 100%;
     background-color: #fff;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
@@ -50,6 +51,7 @@ select {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
 }
 
 /* Title Styling */
@@ -150,14 +152,141 @@ button {
 button:hover {
     background-color: #1d4ed8;
 }
-#leetcode-injected-popup {
-    position: fixed;
-    top: 100px;
-    right: 40px;
-    z-index: 9999;
-    background: white;
-    border: 1px solid #ddd;
+
+
+/* Container */
+.popup-container {
+    min-width: 350px;
+    max-width: 420px;
+    min-height: 100vh;
+    height: 100vh;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(60, 72, 180, 0.18);
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 18px;
+    animation: popup-fade-in 0.5s;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+}
+
+@keyframes popup-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Title */
+.popup-title {
+    margin: 0 0 18px 0;
+    font-size: 1.7em;
+    text-align: center;
+    background: linear-gradient(90deg, #6366f1 0%, #06b6d4 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 14px 0;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.08);
+    font-weight: 800;
+    animation: popup-title-fade 0.7s;
+}
+
+@keyframes popup-title-fade {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Filter dropdown */
+.popup-filter {
+    margin: 0 auto 10px auto;
+    display: block;
+    padding: 8px 18px;
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    padding: 12px;
+    border: 2px solid #6366f1;
+    background: #f1f5f9;
+    color: #3730a3;
+    font-weight: 600;
+    font-size: 1.08em;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.06);
+    transition: border 0.2s;
+}
+
+.popup-filter:focus {
+    border: 2px solid #06b6d4;
+    outline: none;
+}
+
+/* Card animation for BookmarkCard */
+.bookmark-card-animated {
+    animation: card-pop-in 0.5s;
+}
+
+@keyframes card-pop-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Optional: Center the "No bookmarks" message */
+.popup-container p {
+    text-align: center;
+    color: #6366f1;
+    font-weight: 500;
+    margin-top: 1.5rem;
+}
+
+/* New container class for inner content */
+.container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    max-height: 340px;
+    /* About 5 cards, adjust if your cards are taller/shorter */
+    padding-bottom: 16px;
+    padding-right: 12px;
+    /* Add space for scrollbar */
+    box-sizing: border-box;
+}
+
+/* Optional: Nice scrollbar */
+.container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.container::-webkit-scrollbar-thumb {
+    background: #a5b4fc;
+    border-radius: 6px;
+}
+
+.container::-webkit-scrollbar-track {
+    background: #e0e7ff;
+    border-radius: 6px;
 }

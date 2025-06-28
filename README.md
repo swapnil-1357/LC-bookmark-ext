@@ -2,6 +2,7 @@
 This is a basic Chrome Extension base template for starting new projects off of initialized with a MIT license.
 
 ## Features
+
 - 🔖 Bookmark any LeetCode problem with custom difficulty and importance.
 - 📚 View all saved problems in a clean, sortable popup.
 - ✏️ Add personal notes to each bookmarked problem.
