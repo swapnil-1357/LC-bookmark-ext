@@ -10,6 +10,7 @@ export default function App() {
   const [filter, setFilter] = useState("All");
   const [noteId, setNoteId] = useState(null);
   const [dark, setDark] = useState(true);
+  const [search, setSearch] = useState("");
 
   const loadBookmarks = () => {
     chrome.storage.sync.get([LC_KEY], (result) => {
@@ -42,7 +43,11 @@ export default function App() {
   };
 
   const filtered = bookmarks
-    .filter(b => filter === "All" || b.difficulty === filter)
+    .filter(b => {
+      const matchesFilter = filter === "All" || b.difficulty === filter;
+      const matchesSearch = b.name.toLowerCase().includes(search.toLowerCase());
+      return matchesFilter && matchesSearch;
+    })
     .sort((a, b) => {
       const priority = { High: 1, Medium: 2, Low: 3 };
       return priority[a.importance] - priority[b.importance];
@@ -80,6 +85,25 @@ export default function App() {
         </button>
 
         <h1 className="popup-title">📚 Bookmarked Problems</h1>
+
+        {/* --- Search Bar --- */}
+        <input
+          type="text"
+          placeholder="Search by question name..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          style={{
+            width: "95%",
+            padding: "8px 8px",
+            marginBottom: "12px",
+            borderRadius: "8px",
+            border: "1.5px solid #a5b4fc",
+            fontSize: "1em",
+            outline: "none",
+            background: dark ? "#232946" : "#fff",
+            color: dark ? "#fff" : "#222"
+          }}
+        />
 
         <select className="popup-filter" value={filter} onChange={(e) => setFilter(e.target.value)}>
           <option value="All">All</option>
