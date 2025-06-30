@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import InjectPopup from "./components/InjectPopup";
 import { showToast } from "./components/helper/toast";
+import NotesModal from "./components/NotesModal";
 
 const mountId = "leetcode-injected-popup";
 const iconId = "add-bookmark-icon";
@@ -183,3 +184,32 @@ observer.observe(document.body, { childList: true, subtree: true });
 
 // Also, run once on load
 injectPopupAndIcon();
+
+// Function to inject NotesModal into LeetCode page
+function openNotesModal(problemId) {
+    let modalDiv = document.getElementById("leetcode-notes-modal-root");
+    if (!modalDiv) {
+        modalDiv = document.createElement("div");
+        modalDiv.id = "leetcode-notes-modal-root";
+        document.body.appendChild(modalDiv);
+    }
+    const root = ReactDOM.createRoot(modalDiv);
+    root.render(
+        <NotesModal
+            problemId={problemId}
+            onClose={() => {
+                root.unmount();
+                modalDiv.remove();
+            }}
+        />
+    );
+}
+
+// Listen for messages from the popup
+if (window.chrome && chrome.runtime && chrome.runtime.onMessage) {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+        if (msg.type === "OPEN_LEETCODE_NOTE_MODAL" && msg.problemId) {
+            openNotesModal(msg.problemId);
+        }
+    });
+}

@@ -3,14 +3,19 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
- "scripts": {
-  "build:popup": "cross-env VITE_BUILD_TARGET=popup vite build",
-  "build:content": "cross-env VITE_BUILD_TARGET=content vite build",
-  "build": "npm run build:popup && npm run build:content"
-},
+  "scripts": {
+    "build:popup": "cross-env VITE_BUILD_TARGET=popup vite build",
+    "build:content": "cross-env VITE_BUILD_TARGET=content vite build",
+    "build": "npm run build:popup && npm run build:content"
+  },
   "dependencies": {
+    "@lexical/react": "^0.32.1",
+    "axios": "^1.10.0",
+    "draft-js": "^0.11.7",
+    "lexical": "^0.32.1",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "react-draft-wysiwyg": "^1.15.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

@@ -3,8 +3,9 @@ import play from "../assets/play.png";
 import del from "../assets/delete.png";
 import note from "../assets/note.png";
 import copy from "../assets/copy.png";
+import { showToast } from "./helper/toast";
 
-export default function BookmarkCard({ bookmark, onDelete, onNote, onCopy, dark }) {
+export default function BookmarkCard({ bookmark, onDelete, onCopy, dark }) {
     const [showTopics, setShowTopics] = useState(false);
 
     const openInNewTab = () => {
@@ -119,7 +120,24 @@ export default function BookmarkCard({ bookmark, onDelete, onNote, onCopy, dark 
                 <div style={{ display: "flex", gap: "10px", marginBottom: "4px", padding: "8px" }}>
                     <img src={play} alt="Open" title="Open Problem" style={iconStyle} onClick={openInNewTab} />
                     <img src={del} alt="Delete" title="Delete Bookmark" style={iconStyle} onClick={onDelete} />
-                    <img src={note} alt="Notes" title="Add/View Notes" style={iconStyle} onClick={onNote} />
+                    <img
+                        src={note}
+                        alt="Notes"
+                        title="Add/View Notes"
+                        style={iconStyle}
+                        onClick={() => {
+                            // Send a message to the content script to open the notes modal
+                            chrome.tabs && chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                                const tab = tabs[0];
+                                if (tab && tab.url && tab.url.includes("leetcode.com")) {
+                                    chrome.tabs.sendMessage(tab.id, { type: "OPEN_LEETCODE_NOTE_MODAL", problemId: bookmark.id });
+                                } else {
+                                    // Optionally show a toast or alert
+                                    showToast("Please open this on a LeetCode problem page.");
+                                }
+                            });
+                        }}
+                    />
                     <img src={copy} alt="Copy" title="Copy Link" style={iconStyle} onClick={onCopy} />
                 </div>
             </div>

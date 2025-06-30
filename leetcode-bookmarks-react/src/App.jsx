@@ -133,8 +133,10 @@ export default function App() {
           <NotesModal
             problemId={noteId}
             onClose={() => setNoteId(null)}
+            dark={dark}
           />
         )}
+
       </div>
     </div>
   );
