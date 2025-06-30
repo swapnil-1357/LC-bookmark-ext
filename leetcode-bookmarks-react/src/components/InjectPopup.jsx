@@ -79,13 +79,21 @@ const buttonStyle = {
     transition: "background 0.2s, transform 0.1s"
 };
 
-const InjectPopup = ({ url, problemName, onSave }) => {
+const InjectPopup = ({ url, problemName, onSave, acceptanceRate, topics }) => {
     const [difficulty, setDifficulty] = useState("Medium");
     const [importance, setImportance] = useState("Medium");
 
     const handleSave = () => {
         const id = (url?.split("/") || []).filter(Boolean).pop() || "unknown-id";
-        const bookmark = { id, name: problemName, url, difficulty, importance };
+        const bookmark = {
+            id,
+            name: problemName,
+            url,
+            difficulty,
+            importance,
+            acceptanceRate,
+            topics
+        };
         onSave(bookmark);
     };
 
@@ -96,6 +104,22 @@ const InjectPopup = ({ url, problemName, onSave }) => {
                 <span style={bulletStyle}>•</span>
                 <strong>Name:</strong>&nbsp;{problemName}
             </div>
+            {acceptanceRate && (
+                <div style={rowStyle}>
+                    <span style={bulletStyle}>•</span>
+                    <span>
+                        <strong>Acceptance Rate:</strong>&nbsp;{acceptanceRate}
+                    </span>
+                </div>
+            )}
+            {topics && topics.length > 0 && (
+                <div style={rowStyle}>
+                    <span style={bulletStyle}>•</span>
+                    <span>
+                        <strong>Topics:</strong>&nbsp;{topics.join(", ")}
+                    </span>
+                </div>
+            )}
             <div style={rowStyle}>
                 <span style={bulletStyle}>•</span>
                 <label style={labelStyle}>

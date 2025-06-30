@@ -1,12 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import InjectPopup from "./components/InjectPopup";
+import { showToast } from "./components/helper/toast";
+import NotesModal from "./components/NotesModal";
 
 const mountId = "leetcode-injected-popup";
 const iconId = "add-bookmark-icon";
 const LC_PROBLEM_KEY = "LC_PROBLEM_KEY";
 
-// Utility: Extracts the question number from the LeetCode problem title
 function getCurrentQuestionNumber() {
     const titleEl = document.querySelector('[data-cy="question-title"]') || document.querySelector('.text-title-large');
     if (!titleEl) return null;
@@ -14,134 +15,201 @@ function getCurrentQuestionNumber() {
     return match ? match[1] : null;
 }
 
-// Utility: Extracts the problem title
 function getCurrentQuestionTitle() {
     const titleEl = document.querySelector('[data-cy="question-title"]') || document.querySelector('.text-title-large');
     return titleEl ? titleEl.textContent.trim() : "";
 }
 
-// Utility: Gets the current URL
 function getCurrentQuestionUrl() {
     return window.location.href;
 }
 
-// Remove old icon and popup if present (for SPA navigation)
+// Fetches acceptance rate and topics from LeetCode GraphQL API
+async function fetchProblemMeta(slug) {
+    const query = `
+    query getQuestionDetail($titleSlug: String!) {
+      question(titleSlug: $titleSlug) {
+        titleSlug
+        stats
+        topicTags {
+          name
+        }
+      }
+    }
+  `;
+    console.log("Fetching meta for slug:", slug);
+    try {
+        const response = await fetch("https://leetcode.com/graphql", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query, variables: { titleSlug: slug } })
+        });
+        const json = await response.json();
+        console.log("LeetCode API response:", json);
+
+        if (json.errors) {
+            console.error("LeetCode API error:", json.errors);
+            return { acceptanceRate: "N/A", topics: [] };
+        }
+
+        const { data } = json;
+        if (!data?.question) {
+            console.warn("No question data found for slug:", slug);
+            return { acceptanceRate: "N/A", topics: [] };
+        }
+        console.log("data.question:", data.question);
+        if (!data.question.stats) {
+            console.warn("No stats found in question data:", data.question);
+            return { acceptanceRate: "N/A", topics: [] };
+        }
+        const stats = JSON.parse(data.question.stats);
+        console.log("Parsed stats:", stats);
+        return {
+            acceptanceRate: stats.acRate || "N/A",
+            topics: Array.isArray(data.question.topicTags)
+                ? data.question.topicTags.map(tag => tag.name)
+                : []
+        };
+    } catch (err) {
+        console.error("Fetch error:", err);
+        return { acceptanceRate: "N/A", topics: [] };
+    }
+}
+
 function cleanUpOld() {
     const oldIcon = document.getElementById(iconId);
     if (oldIcon) oldIcon.remove();
     const oldPopup = document.getElementById(mountId);
     if (oldPopup) {
-        if (oldPopup._reactRootContainer) {
-            ReactDOM.unmountComponentAtNode(oldPopup);
+        if (reactRoot) {
+            reactRoot.unmount();
+            reactRoot = null;
         }
         oldPopup.remove();
     }
 }
 
 let lastInjectedQuestion = null;
+let reactRoot = null;
 
-// Injects the popup and the bookmark icon for the current question
-function injectPopupAndIcon() {
-    const questionNumber = getCurrentQuestionNumber();
-    if (!questionNumber) return;
+async function injectPopupAndIcon() {
+    const qNum = getCurrentQuestionNumber();
+    if (!qNum) return;
 
-    // Prevent duplicate injection for the same question
-    if (lastInjectedQuestion === questionNumber) return;
-    lastInjectedQuestion = questionNumber;
+    // Only re-inject if the question changed
+    if (lastInjectedQuestion !== qNum) {
+        lastInjectedQuestion = qNum;
+        cleanUpOld();
 
-    cleanUpOld();
+        const container = document.querySelector(".items-start");
+        if (!container) return;
 
-    // --- Icon ---
-    const container = document.querySelector(".items-start");
-    if (!container) return;
+        const img = document.createElement("img");
+        img.id = iconId;
+        img.src = chrome.runtime.getURL("assets/bookmark.png");
+        img.style.width = "28px";
+        img.style.height = "28px";
+        img.style.marginLeft = "12px";
+        img.style.cursor = "pointer";
+        container.appendChild(img);
 
-    const img = document.createElement("img");
-    img.id = iconId;
-    img.src = chrome.runtime.getURL("assets/bookmark.png");
-    img.style.width = "28px";
-    img.style.height = "28px";
-    img.style.marginLeft = "12px";
-    img.style.cursor = "pointer";
+        const mount = document.createElement("div");
+        mount.id = mountId;
+        Object.assign(mount.style, {
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            zIndex: "9999",
+            display: "none"
+        });
+        document.body.appendChild(mount);
 
-    // --- Popup ---
-    const mount = document.createElement("div");
-    mount.id = mountId;
-    mount.style.position = "fixed";
-    mount.style.top = "50%";
-    mount.style.left = "50%";
-    mount.style.transform = "translate(-50%, -50%)";
-    mount.style.zIndex = "9999";
-    mount.style.display = "none";
-    document.body.appendChild(mount);
+        const url = getCurrentQuestionUrl();
+        const title = getCurrentQuestionTitle();
+        // FIX: Extract only the slug, not the query string
+        const slug = url.split("/problems/")[1]?.split("/")[0]?.split("?")[0];
 
-    // Get title and url for this question
-    const title = getCurrentQuestionTitle();
-    const url = getCurrentQuestionUrl();
-
-    chrome.storage.sync.get([LC_PROBLEM_KEY], (result) => {
-        const existing = result[LC_PROBLEM_KEY] || [];
-        const alreadyBookmarked = existing.some(b => b.id === questionNumber);
+        const meta = await fetchProblemMeta(slug);
+        console.log("InjectPopup meta:", meta);
 
         const handleSave = (bookmark) => {
-            bookmark.id = questionNumber;
+            bookmark.id = qNum;
             bookmark.name = title;
             bookmark.url = url;
+            bookmark.acceptanceRate = meta.acceptanceRate;
+            bookmark.topics = meta.topics;
             bookmark.addedAt = new Date().toISOString();
-            chrome.storage.sync.get([LC_PROBLEM_KEY], (result) => {
-                const existing = result[LC_PROBLEM_KEY] || [];
-                // Check by URL
+
+            chrome.storage.sync.get([LC_PROBLEM_KEY], (res) => {
+                const existing = res[LC_PROBLEM_KEY] || [];
                 if (existing.some(b => b.url === url)) {
-                    alert("This problem is already bookmarked!");
-                    const popup = document.getElementById(mountId);
-                    if (popup) popup.style.display = "none";
+                    showToast("Already bookmarked!");
                     return;
                 }
-                const updated = [...existing, bookmark];
-                chrome.storage.sync.set({ [LC_PROBLEM_KEY]: updated }, () => {
-                    alert("✅ Problem bookmarked!");
-                    const popup = document.getElementById(mountId);
-                    if (popup) popup.style.display = "none";
+                chrome.storage.sync.set({ [LC_PROBLEM_KEY]: [...existing, bookmark] }, () => {
+                    showToast("✅ Problem bookmarked!");
+                    mount.style.display = "none";
                 });
             });
         };
 
-        const root = ReactDOM.createRoot(mount);
-        root.render(
-            <InjectPopup
-                onSave={handleSave}
-                problemName={title}
-                url={url}
-            />
-        );
+        reactRoot = ReactDOM.createRoot(mount);
+        reactRoot.render(<InjectPopup
+            onSave={handleSave}
+            problemName={title}
+            url={url}
+            acceptanceRate={meta.acceptanceRate}
+            topics={meta.topics}
+        />);
 
         img.onclick = () => {
-            chrome.storage.sync.get([LC_PROBLEM_KEY], (result2) => {
-                const existing2 = result2[LC_PROBLEM_KEY] || [];
-                // Check by URL
-                const isBookmarked = existing2.some(b => b.url === url);
-                const popup = document.getElementById(mountId);
-                if (isBookmarked) {
-                    alert("This problem is already bookmarked!");
-                    if (popup) popup.style.display = "none";
-                } else {
-                    if (popup) popup.style.display = "block";
+            chrome.storage.sync.get([LC_PROBLEM_KEY], (res) => {
+                const existing = res[LC_PROBLEM_KEY] || [];
+                if (existing.some(b => b.url === url)) {
+                    showToast("Already bookmarked!");
+                    return;
                 }
+                mount.style.display = mount.style.display === "block" ? "none" : "block";
             });
         };
+    }
+}
 
-        container.appendChild(img);
+// Observe DOM changes and try to inject the button when needed
+const observer = new MutationObserver(() => {
+    injectPopupAndIcon();
+});
+observer.observe(document.body, { childList: true, subtree: true });
+
+// Also, run once on load
+injectPopupAndIcon();
+
+// Function to inject NotesModal into LeetCode page
+function openNotesModal(problemId) {
+    let modalDiv = document.getElementById("leetcode-notes-modal-root");
+    if (!modalDiv) {
+        modalDiv = document.createElement("div");
+        modalDiv.id = "leetcode-notes-modal-root";
+        document.body.appendChild(modalDiv);
+    }
+    const root = ReactDOM.createRoot(modalDiv);
+    root.render(
+        <NotesModal
+            problemId={problemId}
+            onClose={() => {
+                root.unmount();
+                modalDiv.remove();
+            }}
+        />
+    );
+}
+
+// Listen for messages from the popup
+if (window.chrome && chrome.runtime && chrome.runtime.onMessage) {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+        if (msg.type === "OPEN_LEETCODE_NOTE_MODAL" && msg.problemId) {
+            openNotesModal(msg.problemId);
+        }
     });
 }
-
-// Throttle observer to avoid rapid firing
-let injectTimeout = null;
-const observer = new MutationObserver(() => {
-    if (injectTimeout) clearTimeout(injectTimeout);
-    injectTimeout = setTimeout(() => {
-        injectPopupAndIcon();
-    }, 200);
-});
-if (document.body) {
-    observer.observe(document.body, { childList: true, subtree: true });
-}
-injectPopupAndIcon(); // Initial run
