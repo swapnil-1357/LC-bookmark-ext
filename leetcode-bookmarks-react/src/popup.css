@@ -156,13 +156,12 @@ button:hover {
 
 /* Container */
 .popup-container {
+    border: 2px solid #fff;
     min-width: 350px;
     max-width: 420px;
     min-height: 0;
     height: auto;
-    max-height: 600px;
-    /* or your preferred max */
-    border-radius: 18px;
+    max-height: 800px;
     box-shadow: 0 8px 32px rgba(60, 72, 180, 0.18);
     font-family: 'Segoe UI', Arial, sans-serif;
     color: #222;
@@ -280,15 +279,139 @@ button:hover {
 
 /* Optional: Nice scrollbar */
 .container::-webkit-scrollbar {
-    width: 8px;
+    width: 2px;
 }
 
 .container::-webkit-scrollbar-thumb {
     background: #a5b4fc;
-    border-radius: 6px;
+    border-radius: 4px;
 }
 
 .container::-webkit-scrollbar-track {
     background: #e0e7ff;
     border-radius: 6px;
+}
+
+/* Dark Mode Styles */
+body,
+#root,
+.popup-container,
+.container {
+    background: transparent;
+}
+
+.popup-container.dark {
+    border: 2px solid #222;
+    background: linear-gradient(135deg, #232946 0%, #1a1a2e 100%) !important;
+    color: #f4f4f4;
+}
+
+.popup-container.dark .container {
+    background: transparent !important;
+}
+
+.popup-container.dark .bookmark {
+    background: #232946 !important;
+    color: #f4f4f4;
+    border: 1px solid #444;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.32);
+}
+
+.popup-container.dark .popup-title {
+    background: linear-gradient(90deg, #232946 0%, #6366f1 100%);
+    color: #fff;
+}
+
+.popup-container.dark .popup-filter {
+    background: #232946;
+    color: #f4f4f4;
+    border: 2px solid #6366f1;
+}
+
+.popup-container.dark .bookmark-title {
+    color: #e0e6f7;
+}
+
+.popup-container.dark .bookmark-meta {
+    color: #bdbddd;
+}
+
+/* Theme Switcher */
+.theme-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.theme-switch input {
+    display: none;
+}
+
+.theme-switch .slider {
+    width: 34px;
+    height: 18px;
+    background: #ccc;
+    border-radius: 50px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.theme-switch .slider:before {
+    content: '';
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    transition: transform 0.2s;
+}
+
+.theme-switch input:checked+.slider {
+    background: #2563eb;
+}
+
+.theme-switch input:checked+.slider:before {
+    transform: translateX(16px);
+}
+
+/* Theme text */
+.theme-text {
+    color: #232946;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.theme-switch input:checked~.theme-text {
+    color: #fff;
+}
+
+body.dark,
+#root.dark,
+.popup-container.dark {
+    background: linear-gradient(135deg, #232946 0%, #1a1a2e 100%) !important;
+}
+/* Make body and #root fill the popup and remove background in dark mode */
+body,
+#root {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    
+    margin: 0;
+    padding: 0;
+    border-radius: 18px;
+    background: transparent !important;
+    box-sizing: border-box;
+}
+
+/* In dark mode, ensure no white border/background is visible */
+body.dark,
+#root.dark,
+.popup-container.dark {
+    background: linear-gradient(135deg, #232946 0%, #1a1a2e 100%) !important;
 }

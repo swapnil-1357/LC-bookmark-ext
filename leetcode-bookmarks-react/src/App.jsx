@@ -9,6 +9,7 @@ export default function App() {
   const [bookmarks, setBookmarks] = useState([]);
   const [filter, setFilter] = useState("All");
   const [noteId, setNoteId] = useState(null);
+  const [dark, setDark] = useState(true);
 
   const loadBookmarks = () => {
     chrome.storage.sync.get([LC_KEY], (result) => {
@@ -17,7 +18,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    loadBookmarks(); // on popup open
+    loadBookmarks();
   }, []);
 
   // Live update when bookmarks are changed in other tabs
@@ -47,9 +48,38 @@ export default function App() {
       return priority[a.importance] - priority[b.importance];
     });
 
+
   return (
-    <div className="popup-container">
+    <div className={`popup-container${dark ? " dark" : ""}`}>
       <div className="container">
+        {/* Dark/Light Toggle Button */}
+        <button
+          className="theme-toggle-btn"
+          onClick={() => setDark(d => !d)}
+          style={{
+            width: "38px",
+            height: "38px",
+            borderRadius: "50%",
+            background: dark
+              ? "linear-gradient(90deg,#6366f1,#06b6d4)"
+              : "linear-gradient(90deg,#f1f5f9,#e0e7ff)",
+            color: dark ? "#fff" : "#222",
+            border: "none",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: "18px",
+            boxShadow: "0 2px 8px rgba(99,102,241,0.08)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            margin: "0 auto 12px auto",
+            transition: "background 0.2s"
+          }}
+          aria-label="Toggle dark mode"
+        >
+          {dark ? "🌙" : "☀️"}
+        </button>
+
         <h1 className="popup-title">📚 Bookmarked Problems</h1>
 
         <select className="popup-filter" value={filter} onChange={(e) => setFilter(e.target.value)}>
@@ -71,6 +101,7 @@ export default function App() {
               onDelete={() => handleDelete(b.id)}
               onNote={() => setNoteId(b.id)}
               onCopy={() => handleCopy(b.url)}
+              dark={dark}
             />
           ))
         )}
@@ -83,5 +114,8 @@ export default function App() {
         )}
       </div>
     </div>
+
+
+
   );
 }

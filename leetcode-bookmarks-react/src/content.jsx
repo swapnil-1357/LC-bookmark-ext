@@ -114,20 +114,38 @@ function injectPopupAndIcon() {
             />
         );
 
-        img.onclick = () => {
-            chrome.storage.sync.get([LC_PROBLEM_KEY], (result2) => {
-                const existing2 = result2[LC_PROBLEM_KEY] || [];
-                // Check by URL
-                const isBookmarked = existing2.some(b => b.url === url);
-                const popup = document.getElementById(mountId);
-                if (isBookmarked) {
-                    alert("This problem is already bookmarked!");
-                    if (popup) popup.style.display = "none";
-                } else {
-                    if (popup) popup.style.display = "block";
-                }
-            });
+        img.onclick = (e) => {
+            e.stopPropagation(); // Prevent triggering document click
+            const popup = document.getElementById(mountId);
+            if (popup.style.display === "block") {
+                popup.style.display = "none";
+            } else {
+                chrome.storage.sync.get([LC_PROBLEM_KEY], (result2) => {
+                    const existing2 = result2[LC_PROBLEM_KEY] || [];
+                    const isBookmarked = existing2.some(b => b.url === url);
+                    if (isBookmarked) {
+                        alert("This problem is already bookmarked!");
+                        if (popup) popup.style.display = "none";
+                    } else {
+                        if (popup) popup.style.display = "block";
+                    }
+                });
+            }
         };
+
+        // Close popup if clicking outside of it
+        document.addEventListener("mousedown", function handleOutsideClick(event) {
+            const popup = document.getElementById(mountId);
+            const icon = document.getElementById(iconId);
+            if (
+                popup &&
+                popup.style.display === "block" &&
+                !popup.contains(event.target) &&
+                event.target !== icon
+            ) {
+                popup.style.display = "none";
+            }
+        });
 
         container.appendChild(img);
     });
