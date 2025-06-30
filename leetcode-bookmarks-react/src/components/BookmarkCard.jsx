@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import play from "../assets/play.png";
 import del from "../assets/delete.png";
 import note from "../assets/note.png";
 import copy from "../assets/copy.png";
 
 export default function BookmarkCard({ bookmark, onDelete, onNote, onCopy, dark }) {
+    const [showTopics, setShowTopics] = useState(false);
+
     const openInNewTab = () => {
         if (chrome?.tabs?.create) {
             chrome.tabs.create({ url: bookmark.url });
@@ -31,7 +33,6 @@ export default function BookmarkCard({ bookmark, onDelete, onNote, onCopy, dark 
                 border: dark ? "1px solid #444" : "1px solid #ccc",
                 borderRadius: "14px",
                 marginBottom: "8px",
-    
                 backgroundColor: dark ? "#232946" : "#fff",
                 color: dark ? "#f4f4f4" : "#222",
                 boxShadow: dark
@@ -53,8 +54,8 @@ export default function BookmarkCard({ bookmark, onDelete, onNote, onCopy, dark 
                 }}>{bookmark.name}</div>
 
                 <div style={{
-                   marginBottom: "2px",
-                   padding: "8px",
+                    marginBottom: "2px",
+                    padding: "8px",
                     fontSize: "14px",
                     color: dark ? "#bdbddd" : "#555"
                 }}>
@@ -65,9 +66,57 @@ export default function BookmarkCard({ bookmark, onDelete, onNote, onCopy, dark 
                     <span style={{ color: difficultyColors[bookmark.difficulty] }}>
                         {bookmark.difficulty}
                     </span>
+                    {/* Show acceptance rate if available */}
+                    {bookmark.acceptanceRate && (
+                        <>
+                            {" - "}
+                            <span style={{ color: dark ? "#38bdf8" : "#2563eb" }}>
+                                {bookmark.acceptanceRate} Acceptance
+                            </span>
+                        </>
+                    )}
                 </div>
 
-                <div style={{ display: "flex", gap: "10px", marginBottom: "4px", padding: "8px"}}>
+                {/* Show topics as a dropdown if available */}
+                {bookmark.topics && bookmark.topics.length > 0 && (
+                    <div style={{
+                        padding: "0 8px 8px 8px",
+                        fontSize: "13px",
+                        color: dark ? "#a5b4fc" : "#334155"
+                    }}>
+                        <strong>Topics:</strong>{" "}
+                        <button
+                            style={{
+                                marginLeft: "8px",
+                                padding: "2px 10px",
+                                borderRadius: "6px",
+                                border: "none",
+                                background: dark ? "#3730a3" : "#e0e7ff",
+                                color: dark ? "#fff" : "#3730a3",
+                                cursor: "pointer",
+                                fontSize: "12px"
+                            }}
+                            onClick={() => setShowTopics(v => !v)}
+                        >
+                            {showTopics ? "Hide" : "Show"}
+                        </button>
+                        {showTopics && (
+                            <ul style={{
+                                margin: "8px 0 0 0",
+                                padding: "0 0 0 18px",
+                                listStyle: "disc",
+                                background: dark ? "#232946" : "#f1f5f9",
+                                borderRadius: "6px"
+                            }}>
+                                {bookmark.topics.map((topic, idx) => (
+                                    <li key={idx}>{topic}</li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
+                )}
+
+                <div style={{ display: "flex", gap: "10px", marginBottom: "4px", padding: "8px" }}>
                     <img src={play} alt="Open" title="Open Problem" style={iconStyle} onClick={openInNewTab} />
                     <img src={del} alt="Delete" title="Delete Bookmark" style={iconStyle} onClick={onDelete} />
                     <img src={note} alt="Notes" title="Add/View Notes" style={iconStyle} onClick={onNote} />

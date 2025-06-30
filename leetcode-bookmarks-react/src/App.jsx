@@ -48,7 +48,6 @@ export default function App() {
       return priority[a.importance] - priority[b.importance];
     });
 
-
   return (
     <div className={`popup-container${dark ? " dark" : ""}`}>
       <div className="container">
@@ -96,7 +95,7 @@ export default function App() {
         ) : (
           filtered.map(b => (
             <BookmarkCard
-              key={b.id}
+              key={b.id + b.difficulty + b.importance} // ensure re-render if fields change
               bookmark={b}
               onDelete={() => handleDelete(b.id)}
               onNote={() => setNoteId(b.id)}
@@ -114,8 +113,5 @@ export default function App() {
         )}
       </div>
     </div>
-
-
-
   );
 }
