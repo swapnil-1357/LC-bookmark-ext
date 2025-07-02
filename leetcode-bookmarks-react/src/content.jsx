@@ -176,7 +176,6 @@ async function injectPopupAndIcon() {
     }
 }
 
-// Observe DOM changes and try to inject the button when needed
 const observer = new MutationObserver(() => {
     injectPopupAndIcon();
 });
@@ -186,20 +185,33 @@ observer.observe(document.body, { childList: true, subtree: true });
 injectPopupAndIcon();
 
 // Function to inject NotesModal into LeetCode page
+let notesModalRoot = null;
+let notesModalReactRoot = null;
+
 function openNotesModal(problemId) {
-    let modalDiv = document.getElementById("leetcode-notes-modal-root");
-    if (!modalDiv) {
-        modalDiv = document.createElement("div");
-        modalDiv.id = "leetcode-notes-modal-root";
-        document.body.appendChild(modalDiv);
+    // If already open, toggle off (close and remove)
+    if (notesModalRoot) {
+        notesModalReactRoot.unmount();
+        notesModalRoot.remove();
+        notesModalReactRoot = null;
+        notesModalRoot = null;
+        return;
     }
-    const root = ReactDOM.createRoot(modalDiv);
-    root.render(
+
+    // Otherwise, create and render it
+    notesModalRoot = document.createElement("div");
+    notesModalRoot.id = "leetcode-notes-modal-root";
+    document.body.appendChild(notesModalRoot);
+
+    notesModalReactRoot = ReactDOM.createRoot(notesModalRoot);
+    notesModalReactRoot.render(
         <NotesModal
             problemId={problemId}
             onClose={() => {
-                root.unmount();
-                modalDiv.remove();
+                notesModalReactRoot.unmount();
+                notesModalRoot.remove();
+                notesModalReactRoot = null;
+                notesModalRoot = null;
             }}
         />
     );
