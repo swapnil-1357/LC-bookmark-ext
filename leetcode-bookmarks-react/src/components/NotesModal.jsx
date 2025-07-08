@@ -5,7 +5,6 @@ import {
     EditorState,
     convertToRaw,
     convertFromRaw,
-    ContentState,
 } from "draft-js";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import axios from "axios";
@@ -56,28 +55,22 @@ export default function NotesModal({ problemId, onClose }) {
         onClose();
     };
 
-    const handleOverlayClick = (e) => {
-        if (e.target === e.currentTarget) onClose();
-    };
+    const uploadImage = useCallback(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", VITE_CLOUD_PRESET);
 
-    const uploadImage = useCallback(
-        async (file) => {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", VITE_CLOUD_PRESET);
-            try {
-                const res = await axios.post(
-                    `https://api.cloudinary.com/v1_1/${VITE_CLOUD_NAME}/image/upload`,
-                    formData
-                );
-                return res.data.secure_url;
-            } catch (error) {
-                console.error("Cloudinary upload failed:", error.response?.data);
-                throw new Error("Image upload failed");
-            }
-        },
-        [VITE_CLOUD_NAME, VITE_CLOUD_PRESET]
-    );
+        try {
+            const res = await axios.post(
+                `https://api.cloudinary.com/v1_1/${VITE_CLOUD_NAME}/image/upload`,
+                formData
+            );
+            return res.data.secure_url;
+        } catch (error) {
+            console.error("Cloudinary upload failed:", error.response?.data);
+            throw new Error("Image upload failed");
+        }
+    }, []);
 
     const uploadImageCallBack = (file) => {
         return new Promise((resolve, reject) => {
@@ -85,6 +78,10 @@ export default function NotesModal({ problemId, onClose }) {
                 .then((url) => resolve({ data: { link: url } }))
                 .catch(reject);
         });
+    };
+
+    const handleOverlayClick = (e) => {
+        if (e.target === e.currentTarget) onClose();
     };
 
     return ReactDOM.createPortal(
@@ -151,9 +148,13 @@ export default function NotesModal({ problemId, onClose }) {
                                 uploadEnabled: true,
                                 uploadCallback: uploadImageCallBack,
                                 previewImage: true,
-                                alignmentEnabled: true,
                                 inputAccept: "image/*",
+                                alignmentEnabled: true,
                                 alt: { present: false, mandatory: false },
+                                defaultSize: {
+                                    height: "auto",
+                                    width: "100%",
+                                },
                             },
                         }}
                     />

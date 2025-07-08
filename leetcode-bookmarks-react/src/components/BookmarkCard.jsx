@@ -16,6 +16,18 @@ export default function BookmarkCard({ bookmark, onDelete, onCopy, dark }) {
         }
     };
 
+    const openTopicPage = (topicName) => {
+        const slug = topicName.toLowerCase().replace(/\s+/g, "-");
+        const tagUrl = `https://leetcode.com/problem-list/${slug}/`;
+
+        if (chrome?.tabs?.create) {
+            chrome.tabs.create({ url: tagUrl });
+        } else {
+            window.open(tagUrl, "_blank");
+        }
+    };
+    
+
     const importanceColors = {
         High: "#e74c3c",
         Medium: "#f39c12",
@@ -67,7 +79,6 @@ export default function BookmarkCard({ bookmark, onDelete, onCopy, dark }) {
                     <span style={{ color: difficultyColors[bookmark.difficulty] }}>
                         {bookmark.difficulty}
                     </span>
-                    {/* Show acceptance rate if available */}
                     {bookmark.acceptanceRate && (
                         <>
                             {" - "}
@@ -78,7 +89,6 @@ export default function BookmarkCard({ bookmark, onDelete, onCopy, dark }) {
                     )}
                 </div>
 
-                {/* Show topics as a dropdown if available */}
                 {bookmark.topics && bookmark.topics.length > 0 && (
                     <div style={{
                         padding: "0 8px 8px 8px",
@@ -110,7 +120,13 @@ export default function BookmarkCard({ bookmark, onDelete, onCopy, dark }) {
                                 borderRadius: "6px"
                             }}>
                                 {bookmark.topics.map((topic, idx) => (
-                                    <li key={idx}>{topic}</li>
+                                    <li
+                                        key={idx}
+                                        style={{ cursor: "pointer", textDecoration: "underline" }}
+                                        onClick={() => openTopicPage(topic)}
+                                    >
+                                        {topic}
+                                    </li>
                                 ))}
                             </ul>
                         )}
@@ -126,13 +142,11 @@ export default function BookmarkCard({ bookmark, onDelete, onCopy, dark }) {
                         title="Add/View Notes"
                         style={iconStyle}
                         onClick={() => {
-                            // Send a message to the content script to open the notes modal
                             chrome.tabs && chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                                 const tab = tabs[0];
                                 if (tab && tab.url && tab.url.includes("leetcode.com")) {
                                     chrome.tabs.sendMessage(tab.id, { type: "OPEN_LEETCODE_NOTE_MODAL", problemId: bookmark.id });
                                 } else {
-                                    // Optionally show a toast or alert
                                     showToast("Please open this on a LeetCode problem page.");
                                 }
                             });

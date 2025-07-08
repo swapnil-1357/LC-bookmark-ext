@@ -15,7 +15,8 @@ const rowStyle = {
     display: "flex",
     alignItems: "center",
     marginBottom: "12px",
-    fontSize: "1em"
+    fontSize: "1em",
+    flexWrap: "wrap"
 };
 
 const labelStyle = {
@@ -79,6 +80,13 @@ const buttonStyle = {
     transition: "background 0.2s, transform 0.1s"
 };
 
+const topicStyle = {
+    color: "#06b6d4",
+    textDecoration: "underline",
+    cursor: "pointer",
+    marginRight: "8px"
+};
+
 const InjectPopup = ({ url, problemName, onSave, acceptanceRate, topics }) => {
     const [difficulty, setDifficulty] = useState("Medium");
     const [importance, setImportance] = useState("Medium");
@@ -97,13 +105,22 @@ const InjectPopup = ({ url, problemName, onSave, acceptanceRate, topics }) => {
         onSave(bookmark);
     };
 
+    const openTagPage = (topicName) => {
+        const slug = topicName.toLowerCase().replace(/\s+/g, "-");
+        const tagUrl = `https://leetcode.com/tag/${slug}/`;
+        window.open(tagUrl, "_blank");
+    };
+    
+
     return (
         <div id="leetcode-injected-popup" style={containerStyle}>
             <h3 style={titleStyle}>Bookmark This Problem</h3>
+
             <div style={rowStyle}>
                 <span style={bulletStyle}>•</span>
                 <strong>Name:</strong>&nbsp;{problemName}
             </div>
+
             {acceptanceRate && (
                 <div style={rowStyle}>
                     <span style={bulletStyle}>•</span>
@@ -112,14 +129,25 @@ const InjectPopup = ({ url, problemName, onSave, acceptanceRate, topics }) => {
                     </span>
                 </div>
             )}
+
             {topics && topics.length > 0 && (
                 <div style={rowStyle}>
                     <span style={bulletStyle}>•</span>
                     <span>
-                        <strong>Topics:</strong>&nbsp;{topics.join(", ")}
+                        <strong>Topics:</strong>&nbsp;
+                        {topics.map((topic, idx) => (
+                            <span
+                                key={idx}
+                                style={topicStyle}
+                                onClick={() => openTagPage(topic)}
+                            >
+                                {topic}
+                            </span>
+                        ))}
                     </span>
                 </div>
             )}
+
             <div style={rowStyle}>
                 <span style={bulletStyle}>•</span>
                 <label style={labelStyle}>
@@ -131,6 +159,7 @@ const InjectPopup = ({ url, problemName, onSave, acceptanceRate, topics }) => {
                     </select>
                 </label>
             </div>
+
             <div style={rowStyle}>
                 <span style={bulletStyle}>•</span>
                 <label style={labelStyle}>
@@ -142,6 +171,7 @@ const InjectPopup = ({ url, problemName, onSave, acceptanceRate, topics }) => {
                     </select>
                 </label>
             </div>
+
             <button style={buttonStyle} onClick={handleSave}>Save</button>
         </div>
     );

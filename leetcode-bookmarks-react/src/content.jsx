@@ -225,3 +225,16 @@ if (window.chrome && chrome.runtime && chrome.runtime.onMessage) {
         }
     });
 }
+if (window.chrome && chrome.runtime && chrome.runtime.onMessage) {
+    chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+        if (msg.type === "OPEN_LEETCODE_NOTE_MODAL" && msg.problemId) {
+            openNotesModal(msg.problemId);
+        }
+
+        // ✅ Handle topic tag click from InjectPopup
+        if (msg.type === "FETCH_LEETCODE_TOPIC_PROBLEMS" && msg.topicSlug) {
+            const topicUrl = `https://leetcode.com/tag/${msg.topicSlug}`;
+            window.open(topicUrl, "_blank");
+        }
+    });
+}
