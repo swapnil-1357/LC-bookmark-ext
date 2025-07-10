@@ -9,24 +9,14 @@ export default function BookmarkCard({ bookmark, onDelete, onCopy, dark }) {
     const [showTopics, setShowTopics] = useState(false);
 
     const openInNewTab = () => {
-        if (chrome?.tabs?.create) {
-            chrome.tabs.create({ url: bookmark.url });
-        } else {
-            window.open(bookmark.url, "_blank");
-        }
+        chrome.tabs.create({ url: bookmark.url });
     };
 
     const openTopicPage = (topicName) => {
         const slug = topicName.toLowerCase().replace(/\s+/g, "-");
-        const tagUrl = `https://leetcode.com/problem-list/${slug}/`;
-
-        if (chrome?.tabs?.create) {
-            chrome.tabs.create({ url: tagUrl });
-        } else {
-            window.open(tagUrl, "_blank");
-        }
+        const tagUrl = `https://leetcode.com/tag/${slug}`;
+        chrome.tabs.create({ url: tagUrl });
     };
-    
 
     const importanceColors = {
         High: "#e74c3c",
@@ -89,7 +79,7 @@ export default function BookmarkCard({ bookmark, onDelete, onCopy, dark }) {
                     )}
                 </div>
 
-                {bookmark.topics && bookmark.topics.length > 0 && (
+                {bookmark.topics?.length > 0 && (
                     <div style={{
                         padding: "0 8px 8px 8px",
                         fontSize: "13px",
@@ -142,10 +132,13 @@ export default function BookmarkCard({ bookmark, onDelete, onCopy, dark }) {
                         title="Add/View Notes"
                         style={iconStyle}
                         onClick={() => {
-                            chrome.tabs && chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                                 const tab = tabs[0];
-                                if (tab && tab.url && tab.url.includes("leetcode.com")) {
-                                    chrome.tabs.sendMessage(tab.id, { type: "OPEN_LEETCODE_NOTE_MODAL", problemId: bookmark.id });
+                                if (tab?.url?.includes("leetcode.com")) {
+                                    chrome.tabs.sendMessage(tab.id, {
+                                        type: "OPEN_LEETCODE_NOTE_MODAL",
+                                        problemId: bookmark.id
+                                    });
                                 } else {
                                     showToast("Please open this on a LeetCode problem page.");
                                 }
