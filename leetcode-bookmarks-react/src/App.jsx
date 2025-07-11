@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import BookmarkCard from './components/BookmarkCard';
 import NotesModal from './components/NotesModal';
+import { useHybridSearch } from './hooks/useHybridSearch';
+import { useDebounce } from './hooks/useDebounce';
 
 const LC_KEY = "LC_PROBLEM_KEY";
 
@@ -11,10 +13,19 @@ export default function App() {
   const [noteId, setNoteId] = useState(null);
   const [dark, setDark] = useState(true);
   const [search, setSearch] = useState("");
+  const [filtered, setFiltered] = useState([]);
+
+  const debouncedSearch = useDebounce(search, 300);
+
+  // Ensure accessor is safe
+  const safeBookmarks = bookmarks.filter(b => typeof b.name === "string" && b.name.trim().length > 0);
+  const { search: hybridSearch, isReady } = useHybridSearch(safeBookmarks, b => b?.name ?? "");
 
   const loadBookmarks = () => {
     chrome.storage.sync.get([LC_KEY], (result) => {
-      setBookmarks(result[LC_KEY] || []);
+      const data = result[LC_KEY] || [];
+      setBookmarks(data);
+      setFiltered(data);
     });
   };
 
@@ -22,41 +33,58 @@ export default function App() {
     loadBookmarks();
   }, []);
 
-  // Live update when bookmarks are changed in other tabs
   useEffect(() => {
     const listener = (changes, area) => {
       if (area === "sync" && changes[LC_KEY]) {
-        setBookmarks(changes[LC_KEY].newValue || []);
+        const updated = changes[LC_KEY].newValue || [];
+        setBookmarks(updated);
+        setFiltered(updated);
       }
     };
     chrome.storage.onChanged.addListener(listener);
     return () => chrome.storage.onChanged.removeListener(listener);
   }, []);
 
+  useEffect(() => {
+    if (!debouncedSearch.trim()) {
+      setFiltered(
+        bookmarks.filter(b =>
+          filter === "All" || b.difficulty === filter
+        ).sort((a, b) => {
+          const priority = { High: 1, Medium: 2, Low: 3 };
+          return priority[a.importance] - priority[b.importance];
+        })
+      );
+    } else if (isReady) {
+      hybridSearch(debouncedSearch).then(results => {
+        const filteredByDiff = results.filter(b =>
+          filter === "All" || b.difficulty === filter
+        );
+        setFiltered(
+          filteredByDiff.sort((a, b) => {
+            const priority = { High: 1, Medium: 2, Low: 3 };
+            return priority[a.importance] - priority[b.importance];
+          })
+        );
+      });
+    }
+  }, [debouncedSearch, filter, bookmarks, isReady]);
+
   const handleDelete = (id) => {
     const updated = bookmarks.filter(b => b.id !== id);
-    chrome.storage.sync.set({ [LC_KEY]: updated }, () => setBookmarks(updated));
+    chrome.storage.sync.set({ [LC_KEY]: updated }, () => {
+      setBookmarks(updated);
+      setFiltered(updated);
+    });
   };
 
   const handleCopy = (url) => {
     navigator.clipboard.writeText(url).then(() => alert("Link copied!"));
   };
 
-  const filtered = bookmarks
-    .filter(b => {
-      const matchesFilter = filter === "All" || b.difficulty === filter;
-      const matchesSearch = b.name.toLowerCase().includes(search.toLowerCase());
-      return matchesFilter && matchesSearch;
-    })
-    .sort((a, b) => {
-      const priority = { High: 1, Medium: 2, Low: 3 };
-      return priority[a.importance] - priority[b.importance];
-    });
-
   return (
     <div className={`popup-container${dark ? " dark" : ""}`}>
       <div className="container">
-        {/* Dark/Light Toggle Button */}
         <button
           className="theme-toggle-btn"
           onClick={() => setDark(d => !d)}
@@ -86,7 +114,6 @@ export default function App() {
 
         <h1 className="popup-title">📚 Bookmarked Problems</h1>
 
-        {/* --- Search Bar --- */}
         <input
           type="text"
           placeholder="Search by question name..."
@@ -105,7 +132,11 @@ export default function App() {
           }}
         />
 
-        <select className="popup-filter" value={filter} onChange={(e) => setFilter(e.target.value)}>
+        <select
+          className="popup-filter"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        >
           <option value="All">All</option>
           <option value="Easy">🟢 Easy</option>
           <option value="Medium">🟠 Medium</option>
@@ -119,7 +150,7 @@ export default function App() {
         ) : (
           filtered.map(b => (
             <BookmarkCard
-              key={b.id + b.difficulty + b.importance} // ensure re-render if fields change
+              key={b.id + b.difficulty + b.importance}
               bookmark={b}
               onDelete={() => handleDelete(b.id)}
               onNote={() => setNoteId(b.id)}
@@ -136,7 +167,6 @@ export default function App() {
             dark={dark}
           />
         )}
-
       </div>
     </div>
   );
