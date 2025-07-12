@@ -7,6 +7,11 @@ const isContent = process.env.VITE_BUILD_TARGET === 'content';
 
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'src'),
+    },
+  },
   define: {
     'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'production'),
     'process.env': {}, // Prevents process-related errors

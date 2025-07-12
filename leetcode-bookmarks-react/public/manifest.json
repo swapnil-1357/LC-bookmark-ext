@@ -3,11 +3,14 @@
   "name": "LC Problem Tracker",
   "version": "0.1",
   "author": "Swapnil Mal",
-  "description": "A chrome extension to store the important LC question to book mark",
+  "description": "A Chrome extension to bookmark and track important LeetCode problems.",
   "permissions": [
     "storage",
     "tabs",
     "scripting"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*"
   ],
   "content_scripts": [
     {
@@ -16,7 +19,8 @@
       ],
       "js": [
         "content.js"
-      ]
+      ],
+      "run_at": "document_idle"
     }
   ],
   "web_accessible_resources": [
@@ -31,7 +35,7 @@
         "assets/note.png"
       ],
       "matches": [
-        "<all_urls>"
+        "https://leetcode.com/*"
       ]
     }
   ],
